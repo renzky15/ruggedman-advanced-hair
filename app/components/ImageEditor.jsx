@@ -271,8 +271,8 @@ export default function ImageEditorComponent() {
   return (
     <div className="flex flex-col items-center">
       <div className="relative" style={{ height: '100vh', width: '100%' }}>
-        <div className="text-black absolute right-20 top-4 z-10 mt-0.5">
-          <label htmlFor="file-upload" className="text-black bg-[#FFD742] text-[14px] px-2 py-1.5 rounded-full">
+        <div className="text-black absolute right-20 top-3 z-10">
+          <label htmlFor="file-upload" className="text-black bg-[#FFD742] text-[.75rem] font-semibold px-3 py-2 rounded-full">
             Upload image
           </label>
           <input id="file-upload" className="hidden" onChange={handleSelectImage} type="file" />
@@ -293,7 +293,7 @@ export default function ImageEditorComponent() {
             y: 0,
             width: '100%',
             height: '100%',
-            backgroundImage: 'img.png',
+            backgroundImage: '/frame.png',
             alwaysOnTop:true,
             backgroundSize:'contain'
           },

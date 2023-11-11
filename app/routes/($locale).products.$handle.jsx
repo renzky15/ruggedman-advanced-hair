@@ -10,6 +10,7 @@ import {
   CartForm,
 } from '@shopify/hydrogen';
 import {getVariantUrl} from '~/utils';
+import ImageEditorComponent from "~/components/ImageEditor";
 
 /**
  * @type {MetaFunction<typeof loader>}
@@ -114,6 +115,7 @@ export default function Product() {
         product={product}
         variants={variants}
       />
+      <ImageEditorComponent />
     </div>
   );
 }

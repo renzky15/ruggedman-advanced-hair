@@ -3,10 +3,37 @@ import React, { useEffect, useRef, useState } from "react";
 // react-pintura
 import { PinturaEditor } from "@pqina/react-pintura";
 
-import { createNode, getEditorDefaults } from "@pqina/pintura";
+import {
+  createDefaultFrameStyles,
+  createDefaultLineEndStyles,
+  createDefaultShapePreprocessor, createFrameStyleProcessor,
+  createLineEndProcessor,
+  createNode,
+  getEditorDefaults,
+  plugin_frame_defaults
+} from "@pqina/pintura";
+const { frameStyles } = plugin_frame_defaults;
 
 // get default properties
 const editorDefaults = getEditorDefaults({
+  frameOptions: [
+    // Custom 'myFrame'
+    ['rugged', 'Rugged Frame'],
+  ],
+
+  // These are the styles available
+  frameStyles: {
+    id: 'rugged',
+    // Our custom frame style
+    rugged: {
+      // The default shape styles for our frame
+      shape: {
+        frameStyle: 'rugged',
+        backgroundImage: '/frame.png',
+      },
+
+    },
+  },
   stickers: [
     {
       src: '/stickers/sticker1.png',
@@ -117,16 +144,31 @@ const editorDefaults = getEditorDefaults({
       alt: 'sticker-19',
     }
   ],
+  imageAnnotation: [
+    {
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+      style: 'white',
+    },
+  ],
+
+  // Set our custom shape preprocessor
+  shapePreprocessor: createDefaultShapePreprocessor([
+    // set default frame styles
+    // createFrameStyleProcessor(createDefaultFrameStyles()),
+  ]),
+
   imageWriter: {
     targetSize: {
-      width: 1024,
+      width: 578,
       height: 768,
-      fit: 'cover'
     },
+
     postprocessImageData: (imageData) =>
       new Promise((resolve, reject) => {
         // Create a canvas element to handle the imageData
-
         const canvas = document.createElement('canvas');
         canvas.width = imageData.width;
         canvas.height = imageData.height;
@@ -167,6 +209,7 @@ const editorDefaults = getEditorDefaults({
         watermark.src = '/img/watermark.svg';
       }),
   },
+
 });
 
 const downloadFile = (file) => {
@@ -208,8 +251,10 @@ export default function ImageEditorComponent() {
 
   useEffect(() => {
     const blankImage = document.createElement('canvas');
-    blankImage.width = 1024;
+    blankImage.width = 578;
     blankImage.height = 768;
+
+
 
     // The default <canvas> is transparent, let's make it white
     const imageContext = blankImage.getContext('2d');
@@ -227,6 +272,14 @@ export default function ImageEditorComponent() {
   const handleSelectImage = (event) => {
     const file = event.target.files[0];
     setImageSrc(file);
+    // editorRef.current.editor
+    //   .loadImage(file)
+    //   .then((imageReaderResult) => {
+    //     // Logs loaded image data
+    //     console.log(imageReaderResult);
+    //
+    //   });
+
   }
   const handleEditorUpdateshape = (shape) => {
     console.log('updateshape', shape);
@@ -235,6 +288,20 @@ export default function ImageEditorComponent() {
     console.log('beforeUpdateShape', shape, props, context);
     return props;
   };
+
+
+  const handleLoadImage = (img) => {
+    editorRef.current.editor.imageFrame = {
+      // the key of the frame in the menu
+      id: 'rugged',
+        // the style of the frame
+        frameStyle: 'rugged',
+        backgroundImage: '/frame.png',
+      // current style properties
+      // frameColor: [1, 1, 1],
+      disableStyle: ['strokeWidth', 'strokeColor'],
+    };
+  }
 
   const willRenderShapeControls = (controls, selectedShapeId) => {
     controls[0][3].push(
@@ -276,38 +343,45 @@ export default function ImageEditorComponent() {
             Upload image
           </label>
           <input id="file-upload" className="hidden" onChange={handleSelectImage} type="file" />
+          {/*<button className="text-black bg-[#FFD742] text-[.75rem] font-semibold px-3 py-2 rounded-full" onClick={handleEditImage}>Edit</button>*/}
         </div>
         {/*<input type="file" className="bg-transparent "  onChange={handleSelectImage} name="Select image"/>*/}
         <PinturaEditor
           {...editorDefaults}
           ref={editorRef}
           src={imageSrc}
-          onLoad={(res) => console.log("load image", res)}
+          utils={[
+            'annotate',
+            'decorate',
+            'sticker',
+            'frame',
+            'crop'
+          ]}
+          onLoad={(res) => handleLoadImage(res)}
           onUpdateshape={handleEditorUpdateshape}
           // onSelectshape={handleEditorSelectshape}
           // beforeUpdateShape={beforeUpdateShape}
           willRenderShapeControls={willRenderShapeControls}
           onProcess={handleProcess}
-          imageAnnotation={[{
-            x: 0,
-            y: 0,
-            width: '100%',
-            height: '100%',
-            backgroundImage: '/frame.png',
-            alwaysOnTop:true,
-            backgroundSize:'contain'
-          },
-            {
-              id:'beforeImage',
-              x: 243,
-              y: 480,
-              width: 150,
-              height: 165,
-              backgroundColor: [0, 0, 0],
-              rotation: -0.16718109997479447,
-              backgroundImage: '',
-              alwaysOnTop:true,
-            },
+          imageCropAspectRatio={12 / 16}
+          imageCropMaxSize={{width: 478, height:768}}
+
+
+        cropMaskOpacity={0}
+          imageAnnotation={[
+          //   {
+          //   x: 0,
+          //   y: 0,
+          //   width: '100%',
+          //   height: '100%',
+          //   backgroundImage: '/frame.png',
+          //   alwaysOnTop:true,
+          //   backgroundSize:'contain',
+          //   disableTextLayout: ['true'],
+          //   disableMove: true,
+          //     disableReorder: true
+          // },
+
           ]}
         />
       </div>

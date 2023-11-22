@@ -12,6 +12,10 @@
   --color-light: #fff;
 }
 
+.custom-rotate {
+  transform: rotate(-0.027turn);
+}
+
 img {
   border-radius: 4px;
 }

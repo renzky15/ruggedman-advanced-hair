@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 
 // react-pintura
-import { PinturaEditor } from "@pqina/react-pintura";
+import { PinturaEditor, PinturaEditorModal } from "@pqina/react-pintura";
 
 import {
   createDefaultFrameStyles,
   createDefaultLineEndStyles,
   createDefaultShapePreprocessor, createFrameStyleProcessor,
-  createLineEndProcessor,
+  createLineEndProcessor, createMarkupEditorOptionsControl, createMarkupEditorShapeStyleControls,
   createNode,
   getEditorDefaults,
   plugin_frame_defaults
@@ -144,15 +144,6 @@ const editorDefaults = getEditorDefaults({
       alt: 'sticker-19',
     }
   ],
-  imageAnnotation: [
-    {
-      x: 0,
-      y: 0,
-      width: 200,
-      height: 200,
-      style: 'white',
-    },
-  ],
 
   // Set our custom shape preprocessor
   shapePreprocessor: createDefaultShapePreprocessor([
@@ -247,7 +238,11 @@ const browse = (options) => {
 export default function ImageEditorComponent() {
   // inline result
   const editorRef = useRef(null);
-  const [imageSrc, setImageSrc] = useState(null);
+  const editorModalRef = useRef(null);
+  const [imageSrc, setImageSrc] = useState(undefined);
+  const [isBlank, setIsBlank] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [result, setResult] = useState("");
 
   useEffect(() => {
     const blankImage = document.createElement('canvas');
@@ -263,6 +258,7 @@ export default function ImageEditorComponent() {
 
     // Set editor source to the canvas
     setImageSrc(blankImage);
+    setIsBlank(true)
   }, []);
 
 
@@ -272,6 +268,7 @@ export default function ImageEditorComponent() {
   const handleSelectImage = (event) => {
     const file = event.target.files[0];
     setImageSrc(file);
+    setIsBlank(false);
     // editorRef.current.editor
     //   .loadImage(file)
     //   .then((imageReaderResult) => {
@@ -302,6 +299,21 @@ export default function ImageEditorComponent() {
       disableStyle: ['strokeWidth', 'strokeColor'],
     };
   }
+
+  const handleOnLoadModal = () => {
+    // editorModalRef.current.editor.imageFrame = {
+    //   // the key of the frame in the menu
+    //   id: 'rugged',
+    //   // the style of the frame
+    //   frameStyle: 'rugged',
+    //   backgroundImage: '/before.png',
+    //   // current style properties
+    //   // frameColor: [1, 1, 1],
+    //   disableStyle: ['strokeWidth', 'strokeColor'],
+    // };
+  }
+
+
 
   const willRenderShapeControls = (controls, selectedShapeId) => {
     controls[0][3].push(
@@ -345,8 +357,9 @@ export default function ImageEditorComponent() {
           <input id="file-upload" className="hidden" onChange={handleSelectImage} type="file" />
           {/*<button className="text-black bg-[#FFD742] text-[.75rem] font-semibold px-3 py-2 rounded-full" onClick={handleEditImage}>Edit</button>*/}
         </div>
+        <button className={`absolute left-20 top-3 z-10 text-black  text-[.75rem] font-semibold px-3 py-2 rounded-full ${isBlank  ? 'bg-[#c8cacc] border border-[#ccc]': 'bg-[#FFD742]'}`} disabled={isBlank} onClick={() => setVisible(true)}>Edit before image</button>
         {/*<input type="file" className="bg-transparent "  onChange={handleSelectImage} name="Select image"/>*/}
-        <PinturaEditor
+        {!visible && <PinturaEditor
           {...editorDefaults}
           ref={editorRef}
           src={imageSrc}
@@ -365,25 +378,45 @@ export default function ImageEditorComponent() {
           onProcess={handleProcess}
           imageCropAspectRatio={12 / 16}
           imageCropMaxSize={{width: 478, height:768}}
+          cropMaskOpacity={0}
+        //   imageAnnotation={[{
+        //     backgroundColor:[1,1,1, 0],
+        //   backgroundImage: result,
+        //   cornerRadius: 0,
+        //   disableErase: true,
+        //   flipX: false,
+        //   flipY: false,
+        //   height: "20%",
+        //   isEditing: false,
+        //   isSelected: false,
+        //   opacity: 1,
+        //   rotation: -0.1651854044405765,
+        //   width: "20%",
+        //   x: "9.926836229103863%",
+        //   y: "59.78706621106059%",
+        //   _isDraft: false,
+        //   _isFormatted: true,
+        //   _prerender: false
+        // }]}
+        />}
 
+        {!!result.length && (
+          <p className={'absolute bottom-[320px] left-[166px] w-24 h-16 custom-rotate'}>
+            <img src={result} alt="" />
+          </p>
+        )}
 
-        cropMaskOpacity={0}
-          imageAnnotation={[
-          //   {
-          //   x: 0,
-          //   y: 0,
-          //   width: '100%',
-          //   height: '100%',
-          //   backgroundImage: '/frame.png',
-          //   alwaysOnTop:true,
-          //   backgroundSize:'contain',
-          //   disableTextLayout: ['true'],
-          //   disableMove: true,
-          //     disableReorder: true
-          // },
-
-          ]}
-        />
+        {visible && (
+            <PinturaEditorModal
+              {...editorDefaults}
+              src={imageSrc}
+              ref={editorModalRef}
+              onLoad={handleOnLoadModal}
+              onHide={() => setVisible(false)}
+              onProcess={({ dest }) => setResult(URL.createObjectURL(dest))}
+              imageCropAspectRatio={12 / 16}
+            />
+        )}
       </div>
     </div>
   )

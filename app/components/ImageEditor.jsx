@@ -29,7 +29,7 @@ const editorDefaults = getEditorDefaults({
       // The default shape styles for our frame
       shape: {
         frameStyle: 'rugged',
-        backgroundImage: '/frame.png',
+        backgroundImage: '/img/frame.png',
       },
 
     },
@@ -152,10 +152,6 @@ const editorDefaults = getEditorDefaults({
   ]),
 
   imageWriter: {
-    targetSize: {
-      width: 578,
-      height: 768,
-    },
 
     postprocessImageData: (imageData) =>
       new Promise((resolve, reject) => {
@@ -200,6 +196,139 @@ const editorDefaults = getEditorDefaults({
         watermark.src = '/img/watermark.svg';
       }),
   },
+
+});
+
+const modalEditorDefaults = getEditorDefaults({
+  frameOptions: [
+    // Custom 'myFrame'
+    ['before', 'Before Frame'],
+  ],
+
+  // These are the styles available
+  frameStyles: {
+    id: 'before',
+    // Our custom frame style
+    before: {
+      // The default shape styles for our frame
+      shape: {
+        frameStyle: 'before',
+        backgroundImage: '/img/beforeFrame.png',
+      },
+
+    },
+  },
+  stickers: [
+    {
+      src: '/stickers/sticker1.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-one',
+    },
+    {
+      src: '/stickers/sticker2.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-two',
+    },
+    {
+      src: '/stickers/sticker3.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-three',
+    },
+    {
+      src: '/stickers/sticker4.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-four',
+    },
+    {
+      src: '/stickers/sticker5.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-five',
+    },
+    {
+      src: '/stickers/sticker6.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-six',
+    },
+    {
+      src: '/stickers/sticker7.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-seven',
+    },
+    {
+      src: '/stickers/sticker8.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-eight',
+    },
+    {
+      src: '/stickers/sticker9.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-nine',
+    },
+    {
+      src: '/stickers/sticker10.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-ten',
+    },
+    {
+      src: '/stickers/1.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-12',
+    },
+    {
+      src: '/stickers/2.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-13',
+    },
+    {
+      src: '/stickers/3.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-14',
+    },
+    {
+      src: '/stickers/4.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-15',
+    },
+    {
+      src: '/stickers/5.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-16',
+    },
+    {
+      src: '/stickers/6.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-17',
+    },
+    {
+      src: '/stickers/7.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-18',
+    },
+    {
+      src: '/stickers/8.png',
+      width: 400,
+      height: 400,
+      alt: 'sticker-19',
+    }
+  ],
+
 
 });
 
@@ -293,7 +422,22 @@ export default function ImageEditorComponent() {
       id: 'rugged',
         // the style of the frame
         frameStyle: 'rugged',
-        backgroundImage: '/frame.png',
+        backgroundImage: '/img/frame.png',
+      // current style properties
+      // frameColor: [1, 1, 1],
+      disableStyle: ['strokeWidth', 'strokeColor'],
+    };
+
+
+  }
+
+  const handleModalLoadImage = (img) => {
+    editorModalRef.current.editor.imageFrame = {
+      // the key of the frame in the menu
+      id: 'before',
+      // the style of the frame
+      frameStyle: 'before',
+      backgroundImage: '/img/beforeFrame.png',
       // current style properties
       // frameColor: [1, 1, 1],
       disableStyle: ['strokeWidth', 'strokeColor'],
@@ -377,7 +521,7 @@ export default function ImageEditorComponent() {
           willRenderShapeControls={willRenderShapeControls}
           onProcess={handleProcess}
           imageCropAspectRatio={12 / 16}
-          imageCropMaxSize={{width: 478, height:768}}
+
           cropMaskOpacity={0}
         //   imageAnnotation={[{
         //     backgroundColor:[1,1,1, 0],
@@ -401,20 +545,29 @@ export default function ImageEditorComponent() {
         />}
 
         {!!result.length && (
-          <p className={'absolute bottom-[320px] left-[166px] w-24 h-16 custom-rotate'}>
+          <p className={'absolute bottom-[320px] left-[190px] w-24 h-16 custom-rotate'}>
             <img src={result} alt="" />
           </p>
         )}
 
         {visible && (
             <PinturaEditorModal
-              {...editorDefaults}
+              {...modalEditorDefaults}
+              utils={[
+                'annotate',
+                'decorate',
+                'sticker',
+                'frame',
+                'crop'
+              ]}
               src={imageSrc}
               ref={editorModalRef}
-              onLoad={handleOnLoadModal}
+              onLoad={handleModalLoadImage}
               onHide={() => setVisible(false)}
               onProcess={({ dest }) => setResult(URL.createObjectURL(dest))}
-              imageCropAspectRatio={12 / 16}
+              imageCropAspectRatio={12/ 16}
+              cropMaskOpacity={0}
+
             />
         )}
       </div>

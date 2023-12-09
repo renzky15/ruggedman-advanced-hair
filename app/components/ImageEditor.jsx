@@ -10,7 +10,8 @@ import {
   createLineEndProcessor, createMarkupEditorOptionsControl, createMarkupEditorShapeStyleControls,
   createNode,
   getEditorDefaults,
-  plugin_frame_defaults
+  plugin_frame_defaults,
+  appendEditor
 } from "@pqina/pintura";
 const { frameStyles } = plugin_frame_defaults;
 
@@ -204,6 +205,14 @@ const modalEditorDefaults = getEditorDefaults({
     // Custom 'myFrame'
     ['before', 'Before Frame'],
   ],
+  imageWriter: {
+    targetSize: {
+      width: 256,
+      height: 256,
+      upscale: true,
+      fit: 'cover',
+    },
+  },
 
   // These are the styles available
   frameStyles: {
@@ -213,7 +222,7 @@ const modalEditorDefaults = getEditorDefaults({
       // The default shape styles for our frame
       shape: {
         frameStyle: 'before',
-        backgroundImage: '/img/beforeFrame.png',
+        backgroundImage: '/img/beforeWhite.png',
       },
 
     },
@@ -372,6 +381,7 @@ export default function ImageEditorComponent() {
   const [isBlank, setIsBlank] = useState(false);
   const [visible, setVisible] = useState(false);
   const [result, setResult] = useState("");
+  const [fileName, setFileName] = useState("Upload image");
 
   useEffect(() => {
     const blankImage = document.createElement('canvas');
@@ -391,13 +401,16 @@ export default function ImageEditorComponent() {
   }, []);
 
 
+
   const handleProcess = (imageState) => {
     downloadFile(imageState.dest);
   }
   const handleSelectImage = (event) => {
     const file = event.target.files[0];
     setImageSrc(file);
+    setFileName("Change image");
     setIsBlank(false);
+
     // editorRef.current.editor
     //   .loadImage(file)
     //   .then((imageReaderResult) => {
@@ -428,7 +441,6 @@ export default function ImageEditorComponent() {
       disableStyle: ['strokeWidth', 'strokeColor'],
     };
 
-
   }
 
   const handleModalLoadImage = (img) => {
@@ -437,7 +449,7 @@ export default function ImageEditorComponent() {
       id: 'before',
       // the style of the frame
       frameStyle: 'before',
-      backgroundImage: '/img/beforeFrame.png',
+      backgroundImage: '/img/beforeWhite.png',
       // current style properties
       // frameColor: [1, 1, 1],
       disableStyle: ['strokeWidth', 'strokeColor'],
@@ -455,6 +467,12 @@ export default function ImageEditorComponent() {
     //   // frameColor: [1, 1, 1],
     //   disableStyle: ['strokeWidth', 'strokeColor'],
     // };
+  }
+
+  const handleModalDoneProcess = (dest) => {
+    console.log(dest, '478');
+    const result = URL.createObjectURL(dest);
+    setResult(result);
   }
 
 
@@ -496,12 +514,13 @@ export default function ImageEditorComponent() {
       <div className="relative" style={{ height: '100vh', width: '100%' }}>
         <div className="text-black absolute right-20 top-3 z-10">
           <label htmlFor="file-upload" className="text-black bg-[#FFD742] text-[.75rem] font-semibold px-3 py-2 rounded-full">
-            Upload image
+            {fileName}
           </label>
           <input id="file-upload" className="hidden" onChange={handleSelectImage} type="file" />
           {/*<button className="text-black bg-[#FFD742] text-[.75rem] font-semibold px-3 py-2 rounded-full" onClick={handleEditImage}>Edit</button>*/}
         </div>
         <button className={`absolute left-20 top-3 z-10 text-black  text-[.75rem] font-semibold px-3 py-2 rounded-full ${isBlank  ? 'bg-[#c8cacc] border border-[#ccc]': 'bg-[#FFD742]'}`} disabled={isBlank} onClick={() => setVisible(true)}>Edit before image</button>
+        <button className={`absolute left-56 top-3 z-10 text-black  text-[.75rem] font-semibold px-3 py-2 rounded-full ${isBlank  ? 'bg-[#c8cacc] border border-[#ccc]': 'bg-red-600 text-white'}`} disabled={isBlank} onClick={() => setResult(URL.createObjectURL(new File([], "blank",{type: "image/jpeg"})))}>Delete</button>
         {/*<input type="file" className="bg-transparent "  onChange={handleSelectImage} name="Select image"/>*/}
         {!visible && <PinturaEditor
           {...editorDefaults}
@@ -510,7 +529,7 @@ export default function ImageEditorComponent() {
           utils={[
             'annotate',
             'decorate',
-            'sticker',
+            `sticker`,
             'frame',
             'crop'
           ]}
@@ -564,7 +583,7 @@ export default function ImageEditorComponent() {
               ref={editorModalRef}
               onLoad={handleModalLoadImage}
               onHide={() => setVisible(false)}
-              onProcess={({ dest }) => setResult(URL.createObjectURL(dest))}
+              onProcess={({ dest }) => handleModalDoneProcess(dest)}
               imageCropAspectRatio={12/ 16}
               cropMaskOpacity={0}
 

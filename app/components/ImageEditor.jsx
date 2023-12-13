@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-
 // react-pintura
 import { PinturaEditor, PinturaEditorModal } from "@pqina/react-pintura";
+import { SiBitwig } from "react-icons/si";
 
 import {
   createDefaultFrameStyles,
@@ -378,6 +378,7 @@ export default function ImageEditorComponent() {
   const editorRef = useRef(null);
   const editorModalRef = useRef(null);
   const [imageSrc, setImageSrc] = useState(undefined);
+  const [beforeSrc, setBeforeSrc] = useState(undefined);
   const [isBlank, setIsBlank] = useState(false);
   const [visible, setVisible] = useState(false);
   const [result, setResult] = useState("");
@@ -406,11 +407,26 @@ export default function ImageEditorComponent() {
     downloadFile(imageState.dest);
   }
   const handleSelectImage = (event) => {
+      const file = event.target.files[0];
+      setImageSrc(file);
+      setFileName("Change image");
+      setIsBlank(false);
+
+    // editorRef.current.editor
+    //   .loadImage(file)
+    //   .then((imageReaderResult) => {
+    //     // Logs loaded image data
+    //     console.log(imageReaderResult);
+    //
+    //   });
+
+  }
+  const handleSelectBeforeImage = (event) => {
     const file = event.target.files[0];
-    setImageSrc(file);
+    setBeforeSrc(file);
     setFileName("Change image");
     setIsBlank(false);
-
+    setVisible(true)
     // editorRef.current.editor
     //   .loadImage(file)
     //   .then((imageReaderResult) => {
@@ -456,7 +472,7 @@ export default function ImageEditorComponent() {
     };
   }
 
-  const handleOnLoadModal = () => {
+  // const handleOnLoadModal = () => {
     // editorModalRef.current.editor.imageFrame = {
     //   // the key of the frame in the menu
     //   id: 'rugged',
@@ -467,10 +483,9 @@ export default function ImageEditorComponent() {
     //   // frameColor: [1, 1, 1],
     //   disableStyle: ['strokeWidth', 'strokeColor'],
     // };
-  }
+  // }
 
   const handleModalDoneProcess = (dest) => {
-    console.log(dest, '478');
     const result = URL.createObjectURL(dest);
     setResult(result);
   }
@@ -519,7 +534,17 @@ export default function ImageEditorComponent() {
           <input id="file-upload" className="hidden" onChange={handleSelectImage} type="file" />
           {/*<button className="text-black bg-[#FFD742] text-[.75rem] font-semibold px-3 py-2 rounded-full" onClick={handleEditImage}>Edit</button>*/}
         </div>
+        <div className={`absolute left-9 top-14 z-10 text-black  text-[.75rem] font-semibold px-3 py-2 rounded-full bg-[#FFD742]`}>
+            <label htmlFor="file-uploadBefore" className="text-black bg-[#FFD742] text-[.75rem] font-semibold px-3 py-2 rounded-full">
+              Choose before image
+            </label>
+            <input id="file-uploadBefore" className="hidden" onChange={handleSelectBeforeImage} type="file" />
+            {/*<button className="text-black bg-[#FFD742] text-[.75rem] font-semibold px-3 py-2 rounded-full" onClick={handleEditImage}>Edit</button>*/}
+          </div>
         <button className={`absolute left-20 top-3 z-10 text-black  text-[.75rem] font-semibold px-3 py-2 rounded-full ${isBlank  ? 'bg-[#c8cacc] border border-[#ccc]': 'bg-[#FFD742]'}`} disabled={isBlank} onClick={() => setVisible(true)}>Edit before image</button>
+
+
+
         <button className={`absolute left-56 top-3 z-10 text-black  text-[.75rem] font-semibold px-3 py-2 rounded-full ${isBlank  ? 'bg-[#c8cacc] border border-[#ccc]': 'bg-red-600 text-white'}`} disabled={isBlank} onClick={() => setResult(URL.createObjectURL(new File([], "blank",{type: "image/jpeg"})))}>Delete</button>
         {/*<input type="file" className="bg-transparent "  onChange={handleSelectImage} name="Select image"/>*/}
         {!visible && <PinturaEditor
@@ -529,7 +554,7 @@ export default function ImageEditorComponent() {
           utils={[
             'annotate',
             'decorate',
-            `sticker`,
+            'sticker',
             'frame',
             'crop'
           ]}
@@ -579,7 +604,7 @@ export default function ImageEditorComponent() {
                 'frame',
                 'crop'
               ]}
-              src={imageSrc}
+              src={beforeSrc}
               ref={editorModalRef}
               onLoad={handleModalLoadImage}
               onHide={() => setVisible(false)}
@@ -589,6 +614,8 @@ export default function ImageEditorComponent() {
 
             />
         )}
+
+        <button className={`absolute right-[302px] focus:bg-[#C3C3C3] bg-white  pointer-events-none bottom-3 border border-[#ECECEC] rounded-xl text-[12px] px-[18px] pb-2 pt-[17px] flex flex-col items-center justify-bottom gap-2`}><SiBitwig className={`text-[12px]`} />Rugs</button>
       </div>
     </div>
   )

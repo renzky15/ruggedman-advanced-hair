@@ -184,6 +184,12 @@ function ProductMain({selectedVariant, product, variants}) {
       <br />
       <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
       <br />
+      <div style={{ position: 'relative', 'padding-bottom': '48.75000000000001%', height: 0}}>
+        <iframe
+          src="https://www.loom.com/embed/7de169cd0aa54d128af934c74caca710?sid=828d185e-eb9a-4b26-8457-7b2d517b2511"
+          frameBorder="0" webkitallowfullscreen mozallowfullscreen allowFullScreen
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></iframe>
+      </div>
     </div>
   );
 }

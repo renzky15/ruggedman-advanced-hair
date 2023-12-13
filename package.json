@@ -24,7 +24,8 @@
     "isbot": "^3.6.6",
     "pica": "^9.0.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.12.0"
   },
   "devDependencies": {
     "@remix-run/dev": "2.1.0",

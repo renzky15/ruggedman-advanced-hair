@@ -85,7 +85,7 @@ function MobileMenuAside({menu, shop}) {
       <HeaderMenu
         menu={menu}
         viewport="mobile"
-        primaryDomainUrl={shop.primaryDomain.url}
+        primaryDomainUrl={shop.primaryDomain.url}z
       />
     </Aside>
   );
